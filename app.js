@@ -1,4 +1,3 @@
- //jshint esversion:6
 require('dotenv').config();
 const express = require("express");
 const bodyParser = require("body-parser");
@@ -27,7 +26,7 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-mongoose.connect("mongodb+srv://admin-siddhi:D1KxQtBPv0sDpDpu@cluster0.bpaprqt.mongodb.net/userDB", {useNewUrlParser: true});
+mongoose.connect("mongodb+srv://admin-siddhi:D1KxQtBPv0sDpDpu@cluster0.bpaprqt.mongodb.net/userDB", {useNewUrlParser: true, useUnifiedTopology : true,});
 mongoose.set("useCreateIndex", true);
 
 const userSchema = new mongoose.Schema ({
@@ -55,6 +54,7 @@ passport.deserializeUser(function(id, done) {
 });
 
 passport.use(new GoogleStrategy({
+
     clientID: process.env.CLIENT_ID,
     clientSecret: process.env.CLIENT_SECRET,
     callbackURL: "http://localhost:3000/auth/google/secrets",
@@ -80,7 +80,6 @@ app.get("/auth/google",
 app.get("/auth/google/secrets",
   passport.authenticate('google', { failureRedirect: "/login" }),
   function(req, res) {
-    // Successful authentication, redirect to secrets.
     res.redirect("/secrets");
   });
 
@@ -115,9 +114,6 @@ app.get("/submit", function(req, res){
 app.post("/submit", function(req, res){
   const submittedSecret = req.body.secret;
 
-//Once the user is authenticated and their session gets saved, their user details are saved to req.user.
-  // console.log(req.user.id);
-
   User.findById(req.user.id, function(err, foundUser){
     if (err) {
       console.log(err);
@@ -133,7 +129,6 @@ app.post("/submit", function(req, res){
 });
 
 app.get("/logout", function(req, res){
-  req.logout();
   res.redirect("/");
 });
 
